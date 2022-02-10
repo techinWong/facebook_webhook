@@ -1,5 +1,10 @@
 'use strict';
 
+const mongoose = require('mongoose')
+mongoose.connect('mongodb://localhost/facebookDB', {
+    useNewUrlParser:true
+})
+const FacebookDB = require('./models/FacebookDB')
 const request = require('request');
 const PAGE_ACCESS_TOKEN = "EAAJdkmsqOxcBAH7W6ZBB3DSYoYjg8piL9Gq3Ih1I5WZClQXo8AEfKFdOZBPiDOrrxZAFr810LZCqCPLA55AObvjwk7mFdzwZAU6DgR4s43TTm4tcZCZCXEfurL1itUsqVN7ZAZCziXDggcAErB8wZC3jrSuPJFWXJDPQx0K7ghSg5YGWurFS3I8I6JR"
 // Imports dependencies and set up http server
@@ -27,6 +32,12 @@ app.post('/webhook', (req, res) => {
         let webhook_event = entry.messaging[0];
         console.log(webhook_event);
         handleMessage(webhook_event.sender.id,webhook_event.message)
+        FacebookDB.create({
+          senderId:webhook_event.sender.id,
+          recipientId:webhook_event.recipient.id,
+          timestamp:webhook_event.timestamp,
+          text:webhook_event.message.text
+        })
       });
   
       // Returns a '200 OK' response to all requests
